@@ -108,7 +108,7 @@ public class TunerConstants {
             .withCANcoderInitialConfigs(cancoderInitialConfigs);
 
 
-    // Front Left: module 1
+    // Front Left
     private static final int kFrontLeftDriveMotorId = 2;
     private static final int kFrontLeftSteerMotorId = 1;
     private static final int kFrontLeftEncoderId = 3;
@@ -118,7 +118,7 @@ public class TunerConstants {
     private static final double kFrontLeftXPosInches = 10.125;
     private static final double kFrontLeftYPosInches = 10.125;
 
-    // Front Right: module 4
+    // Front Right
     private static final int kFrontRightDriveMotorId = 11;
     private static final int kFrontRightSteerMotorId = 10;
     private static final int kFrontRightEncoderId = 12;
@@ -128,7 +128,7 @@ public class TunerConstants {
     private static final double kFrontRightXPosInches = 10.125;
     private static final double kFrontRightYPosInches = -10.125;
 
-    // Back Left: module 2
+    // Back Left
     private static final int kBackLeftDriveMotorId = 5;
     private static final int kBackLeftSteerMotorId = 4;
     private static final int kBackLeftEncoderId = 6;
@@ -138,7 +138,7 @@ public class TunerConstants {
     private static final double kBackLeftXPosInches = -10.125;
     private static final double kBackLeftYPosInches = 10.125;
 
-    // Back Right: module 3
+    // Back Right
     private static final int kBackRightDriveMotorId = 8;
     private static final int kBackRightSteerMotorId = 7;
     private static final int kBackRightEncoderId = 9;
