@@ -4,9 +4,11 @@
 
 package frc.robot.commands;
 
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */
@@ -16,5 +18,24 @@ public final class Autos {
 
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");
+  }
+
+  public static SequentialCommandGroup wheelRotationTest(CommandSwerveDrivetrain drivetrain) {
+    return new SequentialCommandGroup(
+      new PointWheelsAtAngle(drivetrain, 0).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, 60).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, 120).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, 180).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, 240).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, 300).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, 360).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, -60).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, -120).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, -180).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, -240).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, -300).withTimeout(2),
+      new PointWheelsAtAngle(drivetrain, -360).withTimeout(2)
+
+    );
   }
 }
