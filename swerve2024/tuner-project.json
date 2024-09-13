@@ -33,7 +33,7 @@
                 "CANbusFriendly": ""
             },
             "IsSteerInverted": true,
-            "EncoderOffset": -0.490234375,
+            "EncoderOffset": 0.25390625,
             "DriveMotorSelectionState": 1,
             "SteerMotorSelectionState": 1,
             "SteerEncoderSelectionState": 1,
@@ -70,7 +70,7 @@
                 "CANbusFriendly": ""
             },
             "IsSteerInverted": true,
-            "EncoderOffset": 0.16259765625,
+            "EncoderOffset": 0.41064453125,
             "DriveMotorSelectionState": 1,
             "SteerMotorSelectionState": 1,
             "SteerEncoderSelectionState": 1,
@@ -107,7 +107,7 @@
                 "CANbusFriendly": ""
             },
             "IsSteerInverted": true,
-            "EncoderOffset": -0.456298828125,
+            "EncoderOffset": -0.204833984375,
             "DriveMotorSelectionState": 1,
             "SteerMotorSelectionState": 1,
             "SteerEncoderSelectionState": 1,
@@ -144,7 +144,7 @@
                 "CANbusFriendly": ""
             },
             "IsSteerInverted": true,
-            "EncoderOffset": -0.08837890625,
+            "EncoderOffset": -0.335205078125,
             "DriveMotorSelectionState": 1,
             "SteerMotorSelectionState": 1,
             "SteerEncoderSelectionState": 1,
