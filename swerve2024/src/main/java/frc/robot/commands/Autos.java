@@ -22,19 +22,20 @@ public final class Autos {
 
   public static SequentialCommandGroup wheelRotationTest(CommandSwerveDrivetrain drivetrain) {
     return new SequentialCommandGroup(
+      // changed to only 180 both ways 9/15 pid tuning
       new PointWheelsAtAngle(drivetrain, 0).withTimeout(2),
       new PointWheelsAtAngle(drivetrain, 60).withTimeout(2),
       new PointWheelsAtAngle(drivetrain, 120).withTimeout(2),
       new PointWheelsAtAngle(drivetrain, 180).withTimeout(2),
-      new PointWheelsAtAngle(drivetrain, 240).withTimeout(2),
-      new PointWheelsAtAngle(drivetrain, 300).withTimeout(2),
-      new PointWheelsAtAngle(drivetrain, 360).withTimeout(2),
+      // new PointWheelsAtAngle(drivetrain, 240).withTimeout(2),
+      // new PointWheelsAtAngle(drivetrain, 300).withTimeout(2),
+      // new PointWheelsAtAngle(drivetrain, 360).withTimeout(2),
       new PointWheelsAtAngle(drivetrain, -60).withTimeout(2),
       new PointWheelsAtAngle(drivetrain, -120).withTimeout(2),
-      new PointWheelsAtAngle(drivetrain, -180).withTimeout(2),
-      new PointWheelsAtAngle(drivetrain, -240).withTimeout(2),
-      new PointWheelsAtAngle(drivetrain, -300).withTimeout(2),
-      new PointWheelsAtAngle(drivetrain, -360).withTimeout(2)
+      new PointWheelsAtAngle(drivetrain, -180).withTimeout(2)
+      // new PointWheelsAtAngle(drivetrain, -240).withTimeout(2),
+      // new PointWheelsAtAngle(drivetrain, -300).withTimeout(2),
+      // new PointWheelsAtAngle(drivetrain, -360).withTimeout(2)
 
     );
   }
