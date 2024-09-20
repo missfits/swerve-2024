@@ -4,10 +4,14 @@
 
 package frc.robot;
 
+import java.nio.file.SecureDirectoryStream;
+
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.fasterxml.jackson.databind.type.PlaceholderForType;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,9 +19,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -38,8 +47,10 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final SwerveRequest.FieldCentricFacingAngle driveWithAngle = new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
 
-
   private final Telemetry logger = new Telemetry(MaxSpeed);
+
+  private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
+  
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -68,11 +79,24 @@ public class RobotContainer {
     DataLogManager.start(); // log networktable 
     DriverStation.startDataLog(DataLogManager.getLog()); // log ds state, joystick data
 
+    // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
+    // To set a different default auto, put its name (as a String) below as a parameter
+    m_autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", m_autoChooser);
+    for (String autoName : AutoBuilder.getAllAutoNames()) {
+      System.out.println(autoName);
+    }
+
+    System.out.println("autos should have printed.");
+
+    // Creating the tab for auto chooser in shuffleboard (under tab named "Comp HUD")
+    ShuffleboardTab compTab = Shuffleboard.getTab("Comp HUD");
+    compTab.add("Auto Chooser", m_autoChooser).withSize(3, 2);
 
     configureBindings();
   }
 
   public Command getAutonomousCommand() {
-    return Autos.wheelRotationTest(drivetrain);
+    return m_autoChooser.getSelected();
   }
 }
