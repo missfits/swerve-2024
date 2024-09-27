@@ -6,9 +6,23 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -32,6 +46,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean hasAppliedOperatorPerspective = false;
 
+
+    private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
+    private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
+    private DoubleArrayPublisher voltagePublisher = NetworkTableInstance.getDefault().getDoubleArrayTopic("drivetrain/moduleVoltages").publish();
+
+    
+
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
         if (Utils.isSimulation()) {
@@ -43,6 +64,54 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (Utils.isSimulation()) {
             startSimThread();
         }
+
+        AutoBuilder.configureHolonomic(
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                    new PIDConstants(5.0, 0.0, 0.0), // NOT TUNED - Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // NOT TUNED - Rotation PID constants
+                    4.5, // default - Max module speed, in m/s
+                    0.43105229381, // guess? - Drive base radius in meters. Distance from robot center to furthest module.
+                    new ReplanningConfig() // Default path replanning config. See the API for the options here
+            ),
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+        );
+    }
+
+
+    // get robot's pose2d
+    public Pose2d getPose() {
+        return this.getState().Pose;
+    }
+
+    // reset drivetrain odometry (pose2d only)
+    public void resetPose(Pose2d pose) {
+        this.getState().Pose = new Pose2d();
+    }
+
+    // get robot's chassisspeeds
+    public ChassisSpeeds getRobotRelativeSpeeds() {
+        return this.getState().speeds;
+    }
+
+    // drive robot from chassis speeds 
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+        this.setControl(new SwerveRequest.ApplyChassisSpeeds().withSpeeds(speeds));
+
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -66,6 +135,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     @Override
     public void periodic() {
+        SwerveModuleState[] swerveModules = {this.getModule(0).getTargetState(), this.getModule(1).getTargetState(), this.getModule(2).getTargetState(), this.getModule(3).getTargetState()};
+        double[] voltages = {this.getModule(0).getDriveMotor().getMotorVoltage().getValue(), this.getModule(1).getDriveMotor().getMotorVoltage().getValue(), this.getModule(2).getDriveMotor().getMotorVoltage().getValue(), this.getModule(3).getDriveMotor().getMotorVoltage().getValue()};
+       
         /* Periodically try to apply the operator perspective */
         /* If we haven't applied the operator perspective before, then we should apply it regardless of DS state */
         /* This allows us to correct the perspective in case the robot code restarts mid-match */
@@ -79,5 +151,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 hasAppliedOperatorPerspective = true;
             });
         }
+
+        publisher.set(this.m_moduleStates);
+
+        targetPublisher.set(swerveModules);
+        voltagePublisher.set(voltages);
+
+
     }
 }
