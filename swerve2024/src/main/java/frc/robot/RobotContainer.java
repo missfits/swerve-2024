@@ -84,10 +84,7 @@ public class RobotContainer {
     m_autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
     for (String autoName : AutoBuilder.getAllAutoNames()) {
-      System.out.println(autoName);
     }
-
-    System.out.println("autos should have printed.");
 
     // Creating the tab for auto chooser in shuffleboard (under tab named "Comp HUD")
     ShuffleboardTab compTab = Shuffleboard.getTab("Comp HUD");
