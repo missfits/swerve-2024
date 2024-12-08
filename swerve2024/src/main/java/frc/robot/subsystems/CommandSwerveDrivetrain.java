@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -75,7 +76,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     new PIDConstants(5.0, 0.0, 0.0), // NOT TUNED - Rotation PID constants
                     4.5, // default - Max module speed, in m/s
                     0.43105229381, // guess? - Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig() // Default path replanning config. See the API for the options here
+                    new ReplanningConfig(false, false) // Default path replanning config. See the API for the options here
             ),
             () -> {
               // Boolean supplier that controls when the path will be mirrored for the red alliance
@@ -98,9 +99,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return this.getState().Pose;
     }
 
-    // reset drivetrain odometry (pose2d only)
+    // reset drivetrain odometry to a certain pose (pose2d only)
     public void resetPose(Pose2d pose) {
-        this.getState().Pose = new Pose2d();
+        this.seedFieldRelative(pose);
     }
 
     // get robot's chassisspeeds
