@@ -73,8 +73,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(DrivetrainConstants.DRIVE_P, DrivetrainConstants.DRIVE_I, DrivetrainConstants.DRIVE_D), // Translation PID constants
-                    new PIDConstants(DrivetrainConstants.STEER_P, DrivetrainConstants.STEER_I, DrivetrainConstants.STEER_D), // Rotation PID constants
+                    new PIDConstants(DrivetrainConstants.ROBOT_DRIVE_P, DrivetrainConstants.ROBOT_DRIVE_I, DrivetrainConstants.ROBOT_DRIVE_D), // Translation PID constants
+                    new PIDConstants(DrivetrainConstants.ROBOT_STEER_P, DrivetrainConstants.ROBOT_STEER_I, DrivetrainConstants.ROBOT_STEER_D), // Rotation PID constants
                     4.5, // default - Max module speed, in m/s
                     0.43105229381, // guess? - Drive base radius in meters. Distance from robot center to furthest module.
                     new ReplanningConfig(false, false) // Default path replanning config. See the API for the options here
