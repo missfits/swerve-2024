@@ -16,4 +16,14 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class DrivetrainConstants {
+    // Not tuned
+    public static final double STEER_P = 5;
+    public static final double STEER_I = 0;
+    public static final double STEER_D = 0;
+    public static final double DRIVE_P = 5;
+    public static final double DRIVE_I = 0;
+    public static final double DRIVE_D = 0;
+  }
 }
