@@ -14,6 +14,7 @@ import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -51,15 +53,16 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   private final SendableChooser<Command> m_autoChooser; // sendable chooser that holds the autos
-  
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
-                                                                                           // negative Y (forward)
-            .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-        ));
+      drivetrain.applyRequest(() -> {
+        double[] shapedValues = inputShape(joystick.getLeftX(), joystick.getLeftY());
+        return drive.withVelocityX(-shapedValues[1] * MaxSpeed) // Drive forward with negative Y (forward)
+          .withVelocityY(-shapedValues[0] * MaxSpeed) // Drive left with negative X (left)
+          .withRotationalRate(-joystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+      }));
+
     snapToAngle.HeadingController = new PhoenixPIDController(DrivetrainConstants.ROBOT_STEER_P, DrivetrainConstants.ROBOT_STEER_I, DrivetrainConstants.ROBOT_STEER_D);
     snapToAngle.HeadingController.enableContinuousInput(0, Math.PI * 2);
     // snap to angle
@@ -99,6 +102,18 @@ public class RobotContainer {
     configureBindings();
   }
 
+
+  private double[] inputShape(double x, double y) {
+    double hypot = Math.hypot(x, y);
+    double deadbandedValue = MathUtil.applyDeadband(hypot, OperatorConstants.JOYSTICK_DEADBAND);
+  
+    double scaleFactor = deadbandedValue * Math.abs(deadbandedValue) / hypot;
+
+    double[] output = {x * scaleFactor, y *scaleFactor};
+
+    return output;
+
+  }
   public Command getAutonomousCommand() {
     return m_autoChooser.getSelected();
   }
