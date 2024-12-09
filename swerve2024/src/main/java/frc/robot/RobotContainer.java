@@ -35,6 +35,9 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
+
+  record JoystickVals(double x, double y) { }
+
   private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * 0.3; // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
@@ -57,9 +60,9 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
       drivetrain.applyRequest(() -> {
-        double[] shapedValues = inputShape(joystick.getLeftX(), joystick.getLeftY());
-        return drive.withVelocityX(-shapedValues[1] * MaxSpeed) // Drive forward with negative Y (forward)
-          .withVelocityY(-shapedValues[0] * MaxSpeed) // Drive left with negative X (left)
+        JoystickVals shapedValues = inputShape(joystick.getLeftX(), joystick.getLeftY());
+        return drive.withVelocityX(-shapedValues.y() * MaxSpeed) // Drive forward with negative Y (forward)
+          .withVelocityY(-shapedValues.x() * MaxSpeed) // Drive left with negative X (left)
           .withRotationalRate(-joystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
       }));
 
@@ -103,13 +106,13 @@ public class RobotContainer {
   }
 
 
-  private double[] inputShape(double x, double y) {
+  private JoystickVals inputShape(double x, double y) {
     double hypot = Math.hypot(x, y);
     double deadbandedValue = MathUtil.applyDeadband(hypot, OperatorConstants.JOYSTICK_DEADBAND);
   
     double scaleFactor = deadbandedValue * Math.abs(deadbandedValue) / hypot;
 
-    double[] output = {x * scaleFactor, y *scaleFactor};
+    JoystickVals output = new JoystickVals(x * scaleFactor, y * scaleFactor);
 
     return output;
 
