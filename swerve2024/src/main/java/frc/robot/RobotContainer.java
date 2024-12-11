@@ -13,6 +13,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 import com.fasterxml.jackson.databind.type.PlaceholderForType;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,8 +30,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.FakeIntakeCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ExampleSubsystem;
 
 public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * 0.3; // kSpeedAt12VoltsMps desired top speed *0.3 for pid tuning 9/15
@@ -91,6 +94,8 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
     for (String autoName : AutoBuilder.getAllAutoNames()) {
     }
+
+    NamedCommands.registerCommand("fakeIntakeCommand", new FakeIntakeCommand(new ExampleSubsystem()));
 
     // Creating the tab for auto chooser in shuffleboard (under tab named "Comp HUD")
     ShuffleboardTab compTab = Shuffleboard.getTab("Comp HUD");
