@@ -88,14 +88,14 @@ public class RobotContainer {
     DataLogManager.start(); // log networktable 
     DriverStation.startDataLog(DataLogManager.getLog()); // log ds state, joystick data
 
+    NamedCommands.registerCommand("fakeIntakeCommand", new FakeIntakeCommand(new ExampleSubsystem()));
+
     // Build an auto chooser with all the PathPlanner autos. Uses Commands.none() as the default option.
     // To set a different default auto, put its name (as a String) below as a parameter
     m_autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
     for (String autoName : AutoBuilder.getAllAutoNames()) {
     }
-
-    NamedCommands.registerCommand("fakeIntakeCommand", new FakeIntakeCommand(new ExampleSubsystem()));
 
     // Creating the tab for auto chooser in shuffleboard (under tab named "Comp HUD")
     ShuffleboardTab compTab = Shuffleboard.getTab("Comp HUD");
