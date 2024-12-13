@@ -24,6 +24,7 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -54,12 +55,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     
     private Pigeon2 m_gyro = getPigeon2();
 
-
     private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
     private DoubleArrayPublisher voltagePublisher = NetworkTableInstance.getDefault().getDoubleArrayTopic("drivetrain/moduleVoltages").publish();
-    private StructPublisher<Rotation2d> rotationPublisher = NetworkTableInstance.getDefault().getStructTopic("drivetrain/rotation", Rotation2d.struct).publish();
+    private DoublePublisher rotationPublisher = NetworkTableInstance.getDefault().getDoubleTopic("drivetrain/rotation").publish();
     
+    private StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getStructTopic("drivetrain/pose", Pose2d.struct).publish();
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
@@ -165,7 +166,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         targetPublisher.set(swerveModules);
         voltagePublisher.set(voltages);
 
-        rotationPublisher.set(m_gyro.getRotation2d());
+        rotationPublisher.set(m_gyro.getAngle());
+        posePublisher.set(getPose());
 
 
     }
