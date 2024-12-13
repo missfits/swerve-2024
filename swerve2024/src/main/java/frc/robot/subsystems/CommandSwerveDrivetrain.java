@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -20,8 +21,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -31,6 +34,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.generated.TunerConstants;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements
@@ -47,12 +51,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private final Rotation2d RedAlliancePerspectiveRotation = Rotation2d.fromDegrees(180);
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean hasAppliedOperatorPerspective = false;
+    
+    private Pigeon2 m_gyro = getPigeon2();
 
 
     private StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/actualModuleStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> targetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("drivetrain/targetModuleStates", SwerveModuleState.struct).publish();
     private DoubleArrayPublisher voltagePublisher = NetworkTableInstance.getDefault().getDoubleArrayTopic("drivetrain/moduleVoltages").publish();
-
+    private StructPublisher<Rotation2d> rotationPublisher = NetworkTableInstance.getDefault().getStructTopic("drivetrain/rotation", Rotation2d.struct).publish();
     
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
@@ -158,6 +164,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         targetPublisher.set(swerveModules);
         voltagePublisher.set(voltages);
+
+        rotationPublisher.set(m_gyro.getRotation2d());
 
 
     }
